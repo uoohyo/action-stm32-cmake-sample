@@ -16,6 +16,26 @@ This repository provides **comprehensive compatibility testing** for the [uoohyo
 
 <!-- TEST_RESULTS_START -->
 
+## Test Results
+
+This table shows the build status for all tested STM32CubeCLT versions:
+
+| STM32CubeCLT Version | Build Status | Configurations | Last Updated | Details |
+|----------------------|--------------|----------------|--------------|---------|
+| v1.21.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.21.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695190) |
+| v1.20.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.20.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695193) |
+| v1.19.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.19.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695225) |
+| v1.18.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.18.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695229) |
+| v1.17.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.17.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695243) |
+| v1.16.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.16.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695198) |
+| v1.15.1 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.15.1.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695216) |
+| v1.15.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.15.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695212) |
+| v1.14.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.14.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695220) |
+| v1.13.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.13.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695224) |
+| v1.12.1 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.12.1.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695186) |
+| v1.12.0 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.12.0.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695234) |
+| v1.11.1 | ![Build Status](https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/test-stm32-v1.11.1.yml?branch=main&label=) | Debug, Release | 2026-05-15 | [Logs](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/25905695219) |
+
 <!-- TEST_RESULTS_END -->
 
 ## Purpose
