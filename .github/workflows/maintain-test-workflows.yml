@@ -1,0 +1,159 @@
+name: Maintain Test Workflows
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday at 00:00 UTC (09:00 KST)
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/templates/test-stm32-template.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-workflows:
+    name: Sync Workflow Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          fetch-depth: 0
+
+      - name: Discover Versions from GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Fetching releases from uoohyo/action-stm32-cmake ==="
+          gh api repos/uoohyo/action-stm32-cmake/releases \
+            --paginate \
+            --jq '.[].tag_name' \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+            | sed 's/^v//' \
+            | sort -V > /tmp/all_versions.txt
+
+          TOTAL_COUNT=$(wc -l < /tmp/all_versions.txt)
+          echo "Total versions found: $TOTAL_COUNT"
+
+      - name: Find Existing Workflows
+        run: |
+          echo "=== Scanning existing workflow files ==="
+          if ls .github/workflows/test-stm32-v*.yml 1> /dev/null 2>&1; then
+            ls .github/workflows/test-stm32-v*.yml \
+              | sed 's|.github/workflows/test-stm32-v||; s|.yml||' \
+              | sort -V > /tmp/existing_versions.txt
+          else
+            touch /tmp/existing_versions.txt
+          fi
+
+          EXISTING_COUNT=$(wc -l < /tmp/existing_versions.txt)
+          echo "Existing workflow files: $EXISTING_COUNT"
+
+      - name: Calculate Differences
+        run: |
+          echo "=== Calculating differences ==="
+          # Ensure consistent sorting for comm
+          export LC_ALL=C
+          sort /tmp/all_versions.txt -o /tmp/all_versions_sorted.txt
+          sort /tmp/existing_versions.txt -o /tmp/existing_versions_sorted.txt
+
+          # New versions (in releases but not in workflows)
+          comm -23 /tmp/all_versions_sorted.txt /tmp/existing_versions_sorted.txt > /tmp/new_versions.txt
+
+          # Removed versions (in workflows but not in releases)
+          comm -13 /tmp/all_versions_sorted.txt /tmp/existing_versions_sorted.txt > /tmp/removed_versions.txt
+
+          NEW_COUNT=$(wc -l < /tmp/new_versions.txt)
+          REMOVED_COUNT=$(wc -l < /tmp/removed_versions.txt)
+
+          echo "New versions to add: $NEW_COUNT"
+          if [ "$NEW_COUNT" -gt 0 ]; then
+            echo "New versions:"
+            cat /tmp/new_versions.txt
+          fi
+
+          echo "Versions to remove: $REMOVED_COUNT"
+          if [ "$REMOVED_COUNT" -gt 0 ]; then
+            echo "Versions to remove:"
+            cat /tmp/removed_versions.txt
+          fi
+
+      - name: Generate Workflows for New Versions
+        run: |
+          echo "=== Generating workflow files for new versions ==="
+          NEW_COUNT=$(wc -l < /tmp/new_versions.txt)
+
+          if [ "$NEW_COUNT" -eq 0 ]; then
+            echo "No new versions to add"
+            exit 0
+          fi
+
+          while IFS= read -r version; do
+            [ -z "$version" ] && continue
+
+            echo "Creating workflow for v${version}..."
+            sed "s/{{VERSION}}/${version}/g" \
+              .github/templates/test-stm32-template.yml \
+              > .github/workflows/test-stm32-v${version}.yml
+
+            echo "✅ Created: .github/workflows/test-stm32-v${version}.yml"
+          done < /tmp/new_versions.txt
+
+      - name: Update Existing Workflows from Template
+        run: |
+          echo "=== Updating all existing workflows from template ==="
+
+          while IFS= read -r version; do
+            [ -z "$version" ] && continue
+
+            echo "Updating workflow for v${version}..."
+            sed "s/{{VERSION}}/${version}/g" \
+              .github/templates/test-stm32-template.yml \
+              > .github/workflows/test-stm32-v${version}.yml
+
+            echo "✅ Updated: .github/workflows/test-stm32-v${version}.yml"
+          done < /tmp/all_versions.txt
+
+      - name: Remove Workflows for Deleted Versions
+        run: |
+          echo "=== Removing workflow files for deleted versions ==="
+          REMOVED_COUNT=$(wc -l < /tmp/removed_versions.txt)
+
+          if [ "$REMOVED_COUNT" -eq 0 ]; then
+            echo "No versions to remove"
+            exit 0
+          fi
+
+          while IFS= read -r version; do
+            [ -z "$version" ] && continue
+
+            echo "Removing workflow for v${version}..."
+            rm -f .github/workflows/test-stm32-v${version}.yml
+
+            echo "✅ Removed: .github/workflows/test-stm32-v${version}.yml"
+          done < /tmp/removed_versions.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .github/workflows/test-stm32-v*.yml
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            NEW_COUNT=$(wc -l < /tmp/new_versions.txt)
+            REMOVED_COUNT=$(wc -l < /tmp/removed_versions.txt)
+
+            COMMIT_MSG="🤖 sync: update test workflows"
+            [ "$NEW_COUNT" -gt 0 ] && COMMIT_MSG="$COMMIT_MSG (+${NEW_COUNT})"
+            [ "$REMOVED_COUNT" -gt 0 ] && COMMIT_MSG="$COMMIT_MSG (-${REMOVED_COUNT})"
+
+            git commit -m "$COMMIT_MSG"
+            git push
+
+            echo "✅ Successfully synced $NEW_COUNT new and removed $REMOVED_COUNT old workflow files"
+          fi
