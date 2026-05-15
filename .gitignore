@@ -1,0 +1,115 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.dll
+*.exe
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Generated files
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# User-specific directories
+__pycache__/
+venv/# 빌드 출력물
+/build/
+/Debug/
+/Release/
+*.o
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+*.lst
+*.list
+
+# IDE 설정 (SW4STM32, AC6, TrueSTUDIO, IAR, MDK-ARM 등)
+.cursor
+.cproject
+.clangd
+.project
+.atollic
+.dep/
+*.launch
+*.ewp
+*.ewd
+*.eww
+*.uvprojx
+*.uvoptx
+*.uvguix.*
+JLinkLog.txt
+JLinkSettings.ini
+c_cpp_properties.json
+
+# 임시 파일
+*.bak
+*.tmp
+*~
+*.swp
+*.orig
+nul
+
+# 종속성 관리자 및 기타
+.metadata/
+.history/
+
+# CMake - 모든 디렉토리에서 무시
+**/CMakeCache.txt
+**/CMakeFiles/
+**/CMakeScripts/
+**/Makefile
+**/cmake_install.cmake
+**/install_manifest.txt
+**/compile_commands.json
+**/CTestTestfile.cmake
+**/_deps/
+
+# Ninja 빌드 시스템 파일
+.ninja_log
+.ninja_deps
+build.ninja
+rules.ninja
+
+# macOS 관련 파일
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# STM32CubeIDE
+.metadata/
+.launch/
+.settings/bundles-lock.store.json
+.settings/bundles.store.json
+
+# 기타
+nul
+%APPDATA%Code
