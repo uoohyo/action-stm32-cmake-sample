@@ -33,7 +33,7 @@ jobs:
       - name: Verify Build Output
         id: verify
         run: |
-          OUTPUT_PATH="f103c8t6_project/build/${{ matrix.config }}/f103c8t6_project.elf"
+          OUTPUT_PATH="f103c8t6_project/build/f103c8t6_project.elf"
 
           for attempt in 1 2 3; do
             if [ -f "$OUTPUT_PATH" ]; then
