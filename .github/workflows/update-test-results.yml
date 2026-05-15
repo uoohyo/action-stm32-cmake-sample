@@ -1,0 +1,104 @@
+name: Update Test Results
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/test-results/**'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: update-readme-results
+  cancel-in-progress: false
+
+jobs:
+  update-readme:
+    name: Update README Table
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Find Recent Test Workflow Runs
+        id: find-runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Finding recent test workflow runs ==="
+          gh run list \
+            --limit 100 \
+            --json databaseId,workflowName,conclusion,createdAt \
+            | jq -r '.[] | select(.workflowName | startswith("Test STM32CubeCLT v")) | select(.conclusion == "success" or .conclusion == "failure") | .databaseId' \
+            > /tmp/test_run_ids.txt
+
+          RUN_COUNT=$(wc -l < /tmp/test_run_ids.txt)
+          echo "Found $RUN_COUNT completed test runs"
+          echo "run_count=$RUN_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Download Test Results from All Runs
+        if: steps.find-runs.outputs.run_count > 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p .github/test-results
+
+          echo "=== Downloading artifacts from all test runs ==="
+          while IFS= read -r run_id; do
+            echo "Downloading artifacts from run $run_id..."
+            gh run download "$run_id" \
+              --pattern 'test-result-*' \
+              --dir .github/test-results/ \
+              || echo "No artifacts found for run $run_id"
+          done < /tmp/test_run_ids.txt
+
+      - name: Flatten Test Results Directory
+        if: steps.find-runs.outputs.run_count > 0
+        run: |
+          echo "=== Flattening test results directory ==="
+          # Move all JSON files from subdirectories to parent directory
+          find .github/test-results/ -type f -name '*.json' -exec mv {} .github/test-results/ \;
+
+          # Remove empty subdirectories
+          find .github/test-results/ -type d -empty -delete
+
+          echo "Flattened structure:"
+          ls -la .github/test-results/*.json 2>/dev/null | head -10
+
+      - name: List Downloaded Results
+        run: |
+          echo "=== Downloaded test results ==="
+          if [ -d ".github/test-results" ]; then
+            ls -la .github/test-results/
+            echo "Total JSON files: $(find .github/test-results/ -name '*.json' | wc -l)"
+          else
+            echo "No test results found"
+            mkdir -p .github/test-results
+          fi
+
+      - name: Update README Table
+        run: |
+          chmod +x .github/scripts/update-readme-table.sh
+          bash .github/scripts/update-readme-table.sh
+
+      - name: Commit README Updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add README.md .github/test-results/
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📊 update test results table [skip ci]"
+            git push
+
+            echo "✅ README updated successfully"
+          fi
