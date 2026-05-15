@@ -110,6 +110,14 @@ Temporary Items
 .settings/bundles-lock.store.json
 .settings/bundles.store.json
 
+# IDE 개인 설정 및 캐시
+.claude/
+.mcp.json
+CLAUDE.md
+.jxbrowser.userdata/
+RemoteSystemsTempFiles/
+dvt/
+
 # 기타
 nul
 %APPDATA%Code
