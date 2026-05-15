@@ -1,0 +1,80 @@
+name: Test STM32CubeCLT v1.16.0
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        config: [Debug, Release]
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build with STM32CubeCLT v1.16.0 - ${{ matrix.config }}
+        id: build
+        uses: uoohyo/action-stm32-cmake@v1.16.0
+        continue-on-error: true
+        with:
+          project-path: 'f103c8t6_project'
+          build-config: ${{ matrix.config }}
+          build-target: 'all'
+
+      - name: Verify Build Output
+        id: verify
+        run: |
+          OUTPUT_PATH="f103c8t6_project/build/${{ matrix.config }}/f103c8t6_project.elf"
+
+          for attempt in 1 2 3; do
+            if [ -f "$OUTPUT_PATH" ]; then
+              echo "✅ Build successful: $OUTPUT_PATH"
+              ls -lh "$OUTPUT_PATH"
+              file "$OUTPUT_PATH"
+              arm-none-eabi-size "$OUTPUT_PATH" || echo "⚠️ arm-none-eabi-size not available"
+              echo "status=success" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            if [ $attempt -lt 3 ]; then
+              echo "⏳ Output file not found, waiting... (attempt $attempt/3)"
+              sleep $((attempt * 2))
+            fi
+          done
+
+          echo "❌ Build failed: Output file not found after 3 attempts"
+          echo "status=failure" >> $GITHUB_OUTPUT
+          exit 1
+
+      - name: Save Test Result
+        if: always() && matrix.config == 'Debug'
+        run: |
+          STATUS="${{ steps.verify.outputs.status || 'failure' }}"
+          LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          mkdir -p .github/test-results
+          cat > .github/test-results/1.16.0.json <<EOF
+          {
+            "version": "1.16.0",
+            "status": "$STATUS",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "log_url": "$LOG_URL"
+          }
+          EOF
+
+      - name: Upload Test Result
+        if: always() && matrix.config == 'Debug'
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-result-1.16.0
+          path: .github/test-results/1.16.0.json
+          retention-days: 90
