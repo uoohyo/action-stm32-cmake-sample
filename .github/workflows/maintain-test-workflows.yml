@@ -27,6 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           echo "=== Fetching releases from uoohyo/action-stm32-cmake ==="
           gh api repos/uoohyo/action-stm32-cmake/releases \
             --paginate \
@@ -36,6 +37,10 @@ jobs:
             | sort -V > /tmp/all_versions.txt
 
           TOTAL_COUNT=$(wc -l < /tmp/all_versions.txt)
+          if [ "$TOTAL_COUNT" -eq 0 ]; then
+            echo "::error::Release discovery returned no versions; refusing to remove existing workflows."
+            exit 1
+          fi
           echo "Total versions found: $TOTAL_COUNT"
 
       - name: Find Existing Workflows
@@ -141,7 +146,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add .github/workflows/test-stm32-v*.yml
+          # Stage added, modified, and deleted generated workflows.
+          git add -A -- '.github/workflows/test-stm32-v*.yml'
 
           if git diff --staged --quiet; then
             echo "No changes to commit"
