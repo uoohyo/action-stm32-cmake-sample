@@ -2,8 +2,11 @@ name: Maintain Test Workflows
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Every Monday at 00:00 UTC (09:00 KST)
+    - cron: '27 0 * * 1'  # Every Monday at 00:00 UTC (09:00 KST)
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/maintain-test-workflows.yml'
   push:
     paths:
       - '.github/templates/test-stm32-template.yml'
@@ -20,7 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Discover Versions from GitHub Releases
@@ -142,6 +146,9 @@ jobs:
           done < /tmp/removed_versions.txt
 
       - name: Commit and Push Changes
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -159,6 +166,13 @@ jobs:
             [ "$NEW_COUNT" -gt 0 ] && COMMIT_MSG="$COMMIT_MSG (+${NEW_COUNT})"
             [ "$REMOVED_COUNT" -gt 0 ] && COMMIT_MSG="$COMMIT_MSG (-${REMOVED_COUNT})"
 
+            # Writing .github/workflows/ requires a PAT with workflow permissions.
+            # Use the default GitHub token for checkout, but PAT only when pushing.
+            if [ -z "$GH_TOKEN" ]; then
+              echo "::error::PAT_TOKEN with workflow-write permission is required to publish generated workflows."
+              exit 1
+            fi
+            gh auth setup-git
             git commit -m "$COMMIT_MSG"
             git push
 
