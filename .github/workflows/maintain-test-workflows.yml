@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/maintain-test-workflows.yml'
+      # This PR is a read-only smoke test of maintenance workflow discovery.
   push:
     paths:
       - '.github/templates/test-stm32-template.yml'
