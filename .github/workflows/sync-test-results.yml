@@ -9,7 +9,7 @@ on:
       - main
     paths:
       - '.github/test-results/**'
-      - '.github/workflows/update-test-results.yml'
+      - '.github/workflows/sync-test-results.yml'
 
 permissions:
   contents: write
