@@ -1,0 +1,113 @@
+name: Update Test Results
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/test-results/**'
+      - '.github/workflows/sync-test-results.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: update-readme-results
+  cancel-in-progress: false
+
+jobs:
+  update-readme:
+    name: Update README Table
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Find latest completed run per version
+        id: find-runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Newest first; keep only the latest complete run of each version
+          # instead of overwriting valid results with older artifacts.
+          gh run list --limit 300 \
+            --json databaseId,workflowName,conclusion,createdAt \
+            | jq -r '
+              map(select(.workflowName | startswith("Test STM32CubeCLT v"))
+                  | select(.conclusion == "success" or .conclusion == "failure"))
+              | sort_by(.createdAt) | reverse
+              | reduce .[] as $run ({};
+                  if has($run.workflowName) then . else
+                  . + {($run.workflowName): ($run.databaseId | tostring)} end)
+              | .[]
+            ' > /tmp/test_run_ids.txt
+          echo "run_count=$(wc -l < /tmp/test_run_ids.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      - name: Download fresh version results
+        if: steps.find-runs.outputs.run_count > 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p .github/test-results
+          while IFS= read -r run_id; do
+            [ -z "$run_id" ] && continue
+            RUN_TMP=$(mktemp -d)
+            if ! gh run download "$run_id" --pattern 'test-result-*' --dir "$RUN_TMP"; then
+              echo "::warning::No accessible test artifact for run $run_id"
+              rm -rf "$RUN_TMP"
+              continue
+            fi
+            while IFS= read -r file; do
+              VERSION=$(jq -er '.version' "$file") || continue
+              if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "::warning::Skipping invalid version in artifact"
+                continue
+              fi
+              jq -e '(.status == "success" or .status == "failure") and (.log_url | type == "string")' "$file" >/dev/null || continue
+              # The list is newest-first. A single run may have a result per
+              # version, and the first result for that version wins.
+              if [ ! -e ".github/test-results/$VERSION.json" ] ||
+                 [ "$(jq -r '.timestamp // ""' "$file")" \> "$(jq -r '.timestamp // ""' ".github/test-results/$VERSION.json")" ]; then
+                cp "$file" ".github/test-results/$VERSION.json"
+              fi
+            done < <(find "$RUN_TMP" -type f -name '*.json')
+            rm -rf "$RUN_TMP"
+          done < /tmp/test_run_ids.txt
+
+      - name: List Downloaded Results
+        run: |
+          echo "=== Downloaded test results ==="
+          if [ -d ".github/test-results" ]; then
+            ls -la .github/test-results/
+            echo "Total JSON files: $(find .github/test-results/ -name '*.json' | wc -l)"
+          else
+            echo "No test results found"
+            mkdir -p .github/test-results
+          fi
+
+      - name: Update README Table
+        run: |
+          chmod +x .github/scripts/update-readme-table.sh
+          bash .github/scripts/update-readme-table.sh
+
+      - name: Commit README Updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add README.md .github/test-results/
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📊 update test results table [skip ci]"
+            git push
+
+            echo "✅ README updated successfully"
+          fi
