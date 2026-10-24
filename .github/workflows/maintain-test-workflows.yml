@@ -172,9 +172,11 @@ jobs:
               echo "::error::PAT_TOKEN with workflow-write permission is required to publish generated workflows."
               exit 1
             fi
-            gh auth setup-git
             git commit -m "$COMMIT_MSG"
-            git push
+            # Checkout uses a read-only token; authorize this push explicitly.
+            # A PAT must grant Contents: write and Workflows: write.
+            git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
+              push origin HEAD:main
 
             echo "✅ Successfully synced $NEW_COUNT new and removed $REMOVED_COUNT old workflow files"
           fi
