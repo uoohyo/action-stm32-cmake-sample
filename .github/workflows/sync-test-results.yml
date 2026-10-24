@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # A rerun must publish on the current main, not the original event SHA.
+          ref: main
 
       - name: Collect run-bound configuration results
         id: collect
