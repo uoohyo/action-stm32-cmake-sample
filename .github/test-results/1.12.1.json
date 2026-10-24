@@ -1,6 +1,15 @@
 {
+  "schema_version": 2,
   "version": "1.12.1",
-  "status": "success",
-  "timestamp": "2026-10-24T09:46:27Z",
-  "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40082607127"
+  "status": "missing",
+  "collection_status": "missing-or-incompatible",
+  "configurations": {},
+  "head_sha": "6e8bc7dfe9886a62b0305de731244a0755f1297c",
+  "branch": "main",
+  "run_id": "40082607127",
+  "run_attempt": 1,
+  "timestamp": "2026-10-24T09:46:32Z",
+  "collected_at": "2026-10-24T17:45:43Z",
+  "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40082607127",
+  "workflow_conclusion": "success"
 }
