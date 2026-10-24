@@ -36,6 +36,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 .github/scripts/test_results.py collect stm32
 
+      - name: Summarize collected outcomes and target runs
+        run: python3 .github/scripts/collection_summary.py stm32
+
       - name: Update README Table
         run: |
           chmod +x .github/scripts/update-readme-table.sh
