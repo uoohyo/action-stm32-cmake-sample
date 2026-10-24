@@ -121,6 +121,11 @@ class OutputTests(unittest.TestCase):
         with self.assertRaises(ValueError): outputs.verify('success', self.directory, self.directory/'expected.out')
 
 class GeneratedWorkflowTests(unittest.TestCase):
+    def test_result_refresh_uses_current_main_on_rerun(self):
+        workflow = (ROOT/'.github/workflows/sync-test-results.yml').read_text()
+        checkout = workflow.split('uses: actions/checkout@v6', 1)[1].split('      - name:', 1)[0]
+        self.assertIn('ref: main', checkout)
+
     def test_generated_workflows_match_template(self):
         templates = list((ROOT/'.github/templates').glob('test-*-template.yml'))
         self.assertEqual(len(templates), 1)
