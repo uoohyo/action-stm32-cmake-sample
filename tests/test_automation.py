@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -16,6 +17,7 @@ def module(name):
     return result
 results = module('test_results')
 outputs = module('verify_output')
+summaries = module('collection_summary')
 
 class ResultsTests(unittest.TestCase):
     def setUp(self):
@@ -26,6 +28,14 @@ class ResultsTests(unittest.TestCase):
                              branch='main', status='success') for c in results.CONFIGS]
     def summary(self):
         return results.summarize('1.2.3', self.run, self.records, 'owner/repo')
+    def test_summary_counts_and_target_runs(self):
+        records = [self.summary(), dict(self.summary(), status="failure", version="1.2.4"),
+                   {"version": "1.2.5", "status": "missing"}]
+        summary = summaries.collection_summary(records)
+        self.assertIn("Success: 1 | Failure: 1 | Missing: 1", summary)
+        self.assertIn("https://github.com/owner/repo/actions/runs/12", summary)
+        self.assertIn("abc", summary)
+        self.assertIn("No completed target run", summary)
     def test_both_configs_pass(self):
         self.assertEqual(self.summary()['status'], 'success')
     def test_release_failure_is_failure(self):
@@ -135,6 +145,22 @@ class GeneratedWorkflowTests(unittest.TestCase):
             version = workflow.stem.split('-v', 1)[1]
             with self.subTest(version=version):
                 self.assertEqual(workflow.read_text(), template.replace('{{VERSION}}', version))
+    def test_template_cleanup_removes_a_stale_output(self):
+        template = next((ROOT/'.github/templates').glob('test-*-template.yml')).read_text()
+        command = re.search(r"run: (rm -rf -- '[^']+')", template).group(1)
+        command = command.replace("{{VERSION}}", "1.2.3").replace("${{ matrix.config }}", "Debug")
+        directory = command.split("'", 2)[1]
+        self.assertFalse(Path(directory).is_absolute())
+        self.assertNotIn("..", Path(directory).parts)
+        with tempfile.TemporaryDirectory() as temporary:
+            output_dir = Path(temporary)/directory
+            output_dir.mkdir(parents=True)
+            stale = output_dir/'stale.out'
+            stale.write_bytes(b'old artifact')
+            subprocess.run(['bash', '-c', command], cwd=temporary, check=True)
+            self.assertFalse(stale.exists())
+            with self.assertRaises(ValueError):
+                outputs.verify('success', output_dir, stale)
     def test_clean_outputs_before_build(self):
         template = next((ROOT/'.github/templates').glob('test-*-template.yml')).read_text()
         self.assertLess(template.index('Remove previous'), template.index('- name: Build with'))
