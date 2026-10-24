@@ -5,7 +5,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/github/v/release/uoohyo/action-stm32-cmake?logo=github" alt="Latest Release" />
-  <img src="https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/maintain-test-workflows.yml?branch=main&label=workflow%20sync" alt="Workflow Sync" />
+  <img src="https://img.shields.io/github/actions/workflow/status/uoohyo/action-stm32-cmake-sample/sync-test-workflows.yml?branch=main&label=workflow%20sync" alt="Workflow Sync" />
   <img src="https://img.shields.io/badge/STM32CubeCLT%20Versions-13-blue" alt="STM32CubeCLT Versions" />
   <img src="https://img.shields.io/badge/Device-STM32F103C8T6-orange" alt="Target Device" />
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
@@ -82,3 +82,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+See [automation validation and support boundaries](docs/automation-validation.md) for result semantics, local tests, and remaining production verification.

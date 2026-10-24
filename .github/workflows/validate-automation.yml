@@ -1,0 +1,26 @@
+name: Validate Automation
+on:
+  pull_request:
+    paths:
+      - '.github/**'
+      - 'tests/**'
+      - 'docs/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/**'
+      - '.github/templates/**'
+      - 'tests/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate scripts and generated workflows
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 -m py_compile .github/scripts/*.py
+          for file in .github/scripts/*.sh; do bash -n "$file"; done
