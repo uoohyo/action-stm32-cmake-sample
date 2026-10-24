@@ -1,15 +1,18 @@
 {
   "schema_version": 2,
   "version": "1.21.0",
-  "status": "missing",
-  "collection_status": "missing-or-incompatible",
-  "configurations": {},
-  "head_sha": "6e8bc7dfe9886a62b0305de731244a0755f1297c",
+  "status": "success",
+  "collection_status": "complete",
+  "configurations": {
+    "Debug": "success",
+    "Release": "success"
+  },
+  "head_sha": "740f48cb6bba3908fefa4a433b307a4fdf96ddcf",
   "branch": "main",
-  "run_id": "40082607132",
+  "run_id": "40117015160",
   "run_attempt": 1,
-  "timestamp": "2026-10-24T09:50:41Z",
-  "collected_at": "2026-10-24T17:45:57Z",
-  "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40082607132",
+  "timestamp": "2026-10-24T17:48:00Z",
+  "collected_at": "2026-10-24T17:53:24Z",
+  "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015160",
   "workflow_conclusion": "success"
 }
