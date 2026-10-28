@@ -4,15 +4,15 @@
   "status": "success",
   "collection_status": "complete",
   "configurations": {
-    "Release": "success",
-    "Debug": "success"
+    "Debug": "success",
+    "Release": "success"
   },
   "head_sha": "740f48cb6bba3908fefa4a433b307a4fdf96ddcf",
   "branch": "main",
   "run_id": "40117015174",
   "run_attempt": 1,
   "timestamp": "2026-10-24T17:47:47Z",
-  "collected_at": "2026-10-28T05:53:08Z",
+  "collected_at": "2026-10-28T13:09:26Z",
   "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015174",
   "workflow_conclusion": "success"
 }
