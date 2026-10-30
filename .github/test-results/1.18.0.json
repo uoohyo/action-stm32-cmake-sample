@@ -1,18 +1,15 @@
 {
   "schema_version": 2,
   "version": "1.18.0",
-  "status": "success",
-  "collection_status": "complete",
-  "configurations": {
-    "Debug": "success",
-    "Release": "success"
-  },
+  "status": "missing",
+  "collection_status": "missing-or-incompatible",
+  "configurations": {},
   "head_sha": "740f48cb6bba3908fefa4a433b307a4fdf96ddcf",
   "branch": "main",
   "run_id": "40117015125",
   "run_attempt": 1,
   "timestamp": "2026-10-24T17:48:44Z",
-  "collected_at": "2026-10-30T13:07:51Z",
+  "collected_at": "2026-10-30T22:27:45Z",
   "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015125",
   "workflow_conclusion": "success"
 }
