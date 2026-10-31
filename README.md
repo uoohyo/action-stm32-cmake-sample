@@ -25,7 +25,7 @@ Results below refer to the linked completed main-branch run, not a moving branch
 | v1.21.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:48:00Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015160) |
 | v1.20.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:47:25Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015095) |
 | v1.19.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:43:16Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015063) |
-| v1.18.0 | missing | missing / missing | 740f48cb6bba | 2026-10-24T17:48:44Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015125) |
+| v1.18.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:48:44Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015125) |
 | v1.17.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:48:04Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015059) |
 | v1.16.0 | success | success / success | 740f48cb6bba | 2026-10-24T17:47:00Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015201) |
 | v1.15.1 | success | success / success | 740f48cb6bba | 2026-10-24T17:47:47Z | [Run](https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015174) |
