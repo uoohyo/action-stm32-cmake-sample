@@ -12,7 +12,7 @@
   "run_id": "40117015104",
   "run_attempt": 1,
   "timestamp": "2026-10-24T17:47:21Z",
-  "collected_at": "2026-10-31T05:54:42Z",
+  "collected_at": "2026-10-31T12:45:05Z",
   "log_url": "https://github.com/uoohyo/action-stm32-cmake-sample/actions/runs/40117015104",
   "workflow_conclusion": "success"
 }
